@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smart Study Planner</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:linear-gradient(135deg,#eef2f7,#f8fafc);min-height:100vh;color:#111}
+header{display:flex;justify-content:space-between;align-items:center;padding:20px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.05);position:sticky;top:0}
+.container{max-width:1000px;margin:auto;padding:20px}
+.card{background:#fff;padding:15px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.06);margin-bottom:15px}
+input,button{padding:10px;border-radius:8px;border:1px solid #ddd}
+button{background:#2563eb;color:#fff;cursor:pointer}
+.tasks{display:flex;flex-direction:column;gap:10px}
+.task{display:flex;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:10px}
+.task.completed{text-decoration:line-through;opacity:.6}
+</style>
+</head>
+<body>
+<header>
+<h1>Smart Study Planner</h1>
+<button onclick="toggleLang()">DE/EN</button>
+</header>
+
+<div class="container">
+<div class="card">
+<input id="title" placeholder="Task"/>
+<input id="date" type="date"/>
+<button onclick="addTask()">Add</button>
+</div>
+
+<div class="card">
+<p id="stats"></p>
+</div>
+
+<div class="card tasks" id="list"></div>
+</div>
+
+<script>
+let tasks=JSON.parse(localStorage.getItem('tasks')||'[]');
+
+function save(){localStorage.setItem('tasks',JSON.stringify(tasks));}
+
+function render(){
+let list=document.getElementById('list');
+list.innerHTML='';
+let done=0;
+tasks.forEach((t,i)=>{
+if(t.status==='done')done++;
+let div=document.createElement('div');
+div.className='task'+(t.status==='done'?' completed':'');
+div.innerHTML=`<span>${t.title}</span>
+<div>
+<button onclick="toggle(${i})">✓</button>
+<button onclick="del(${i})">X</button>
+</div>`;
+list.appendChild(div);
+});
+document.getElementById('stats').innerText=
+`Total: ${tasks.length} Done: ${done} %${tasks.length?Math.round(done/tasks.length*100):0}`;
+save();
+}
+
+function addTask(){
+let t=document.getElementById('title').value;
+let d=document.getElementById('date').value;
+if(!t)return;
+tasks.push({title:t,date:d,status:'pending'});
+render();
+}
+
+function toggle(i){
+tasks[i].status=tasks[i].status==='done'?'pending':'done';
+render();
+}
+
+function del(i){
+tasks.splice(i,1);
+render();
+}
+
+let lang='en';
+function toggleLang(){
+lang=lang==='en'?'de':'en';
+alert('Language toggle demo');
+}
+
+render();
+</script>
+</body>
+</html>
